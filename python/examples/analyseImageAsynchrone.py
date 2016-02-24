@@ -3,7 +3,7 @@ import time
 import base64
 
 # Create connection
-conn = idcheckio.IDCheckIO("ariadnext.exemple@ariadnext.com", "exemple@", host="idcheckio.rennes.ariadnext.com", port="9443", verify=False)
+conn = idcheckio.IDCheckIO("example@example.com", "exemple")
 
 # Send image for analysis
 result = conn.analyse_image("/tmp/recto.jpg", async=True, path=True)

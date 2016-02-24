@@ -1,7 +1,7 @@
 import idcheckio
 import time
 
-conn = idcheckio.IDCheckIO("ariadnext.exemple@ariadnext.com", "exemple@", host="idcheckio.rennes.ariadnext.com", port="9443", verify=False)
+conn = idcheckio.IDCheckIO("example@example.com", "exemple")
 
 # Analyse a identity card with recto and verso.
 result = conn.analyse_image("/tmp/recto.jpg", "/tmp/verso.jpg", path=True)
