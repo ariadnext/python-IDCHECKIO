@@ -113,7 +113,7 @@ class IDCheckIO:
     """
 
 
-    def __init__(self, user, pwd, language="en", host="idcheck.io",
+    def __init__(self, user, pwd, language="en", host="api.idcheck.io",
                  protocol="https", port="443", verify=True):
         """Initialisation function to create the connection on the idcheck.io
         server.
@@ -154,7 +154,11 @@ class IDCheckIO:
         """Analyse a MRZ (Machine Readable Zone) from an identity card.
 
         Return a ResponseIDCIO with the status (http code), the uid of the
-        request and the body with the server response in JSON format. 
+        request and the body with the server response in JSON format.
+
+        Note:
+            Return the value "-1" for status and the value "0" for uid if
+            the server is unreachable.
 
         In synchronous mode, the server response contains a control report
         about the MRZ sent.
@@ -181,10 +185,13 @@ class IDCheckIO:
             response = requests.post(url, data=json.dumps(data), headers=self.headers,
                                  verify=self.verify)
             result = ResponseIDCIO(response.status_code, response.json()["uid"],
-                                   response.json())
+                                       response.json())
         except requests.exceptions.ConnectionError:
             result = ResponseIDCIO(-1, 0,
                                    {"errorMessage": "Error: Unable to acess server"})
+        except KeyError:
+            result = ResponseIDCIO(response.status_code, 0, response.json())
+
         return result
 
 
@@ -193,6 +200,10 @@ class IDCheckIO:
 
         Return a ResponseIDCIO with the status (http code), the uid of the request
         and the body with the server response in JSON format.
+
+        Note:
+            Return the value "-1" for status and the value "0" for uid if
+            the server is unreachable.
 
         In synchronous mode, the server response contains a control report
         about the MRZ sent.
@@ -253,7 +264,6 @@ class IDCheckIO:
             result = ResponseIDCIO(-1, 0, 
                                    {"errorMessage": "Error: Unable to acess server"})
         except KeyError:
-            print("Warn: Something wrong on uid recuperation")
             result = ResponseIDCIO(response.status_code, 0, response.json())
 
         return result
@@ -269,6 +279,8 @@ class IDCheckIO:
         Note:
             This function must be called only on an analysis finished by the server
             (asynchronous mode).
+            Return the value "-1" for status and the value "0" for uid if
+            the server is unreachable.
 
         Arguments:
             uid (str): The uid of the request, retrieved on the response of an
@@ -297,6 +309,8 @@ class IDCheckIO:
         except requests.exceptions.ConnectionError:
             result = ResponseIDCIO(-1, 0, 
                                    {"errorMessage": "Error: Unable to acess server"})
+        except KeyError:
+            result = ResponseIDCIO(response.status_code, 0, response.json())
 
         return result
 
@@ -306,6 +320,10 @@ class IDCheckIO:
 
         Return a ResponseIDCIO with the status (http code), the uid of the request
         and the body with the server response in JSON format.
+
+        Note:
+            Return the value "-1" for status and the value "0" for uid if
+            the server is unreachable.
 
         The PDF report is encoded in base64, retrievable in the field "report".
 
@@ -350,6 +368,10 @@ class IDCheckIO:
 
         Return a ResponseIDCIO with the status (http code), the uid of the request
         and the body with the server response in JSON format.
+
+        Note:
+            Return the value "-1" for status and the value "0" for uid if
+            the server is unreachable.
 
         Arguments:
             uid (str): The uid of the request, retrieved on the response of an
