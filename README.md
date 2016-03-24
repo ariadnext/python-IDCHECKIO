@@ -1,4 +1,5 @@
-# python-IDCHECKIO : Python Library for IDCHECKIO API
+# python-IDCHECKIO
+## Python Library for IDCHECKIO API
 
 ![IDCHECKIO logo](https://www.idcheck.io/content/uploads/sites/2/2015/12/tick_mark.png)
 
@@ -23,9 +24,9 @@ To install Requests, simply:
 
 ## Usage
 ### AnalyseMRZ
-```
-import idcheckio
+.. code-block:: python
+    import idcheckio
+    conn = idcheckio.IDCheckIO("example@example.com", "exemple")
+    result = conn.analyse_mrz("P<UTOBANDERAS<<LILIAN<<<<<<<<<<<<<<<<<<<<<<<",
+                              "01234567894UTO8001014F2501017<<<<<<<<<<<<<06")
 
-conn = idcheckio.IDCheckIO("example@example.com", "exemple")
-result = conn.analyse_mrz("P<UTOBANDERAS<<LILIAN<<<<<<<<<<<<<<<<<<<<<<<", "01234567894UTO8001014F2501017<<<<<<<<<<<<<06")
-```
