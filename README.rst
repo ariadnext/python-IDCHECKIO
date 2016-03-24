@@ -24,6 +24,7 @@ To create your account an credit, contact us by email with your needs at : conta
 Installation
 ------------
 To install Requests, simply:
+
 .. code-block:: bash
 
     $ pip install idcheckio
