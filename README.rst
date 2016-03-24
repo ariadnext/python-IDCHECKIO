@@ -1,7 +1,9 @@
-# python-IDCHECKIO
-## Python Library for IDCHECKIO API
+python-IDCHECKIO
+================
+Python Library for IDCHECKIO API
+================================
 
-![IDCHECKIO logo](https://www.idcheck.io/content/uploads/sites/2/2015/12/tick_mark.png)
+.. image:: https://www.idcheck.io/content/uploads/sites/2/2015/12/tick_mark.png
 
 Web application : <https://idcheck.io>
 
@@ -9,21 +11,27 @@ Mashape REST API : <https://market.mashape.com/ariadnext/idcheck-io-api>
 
 Swagger REST API : <https://api.idcheck.io/swagger/#/>
 
-## Requirements
+Requirements
+------------
+
 This module works in Python2.X and Python3.X.
 
 ### Account
+
 To create your account an credit, contact us by email with your needs at : contact@idcheck.io
 
 
-## Installation
+Installation
+------------
 To install Requests, simply:
 ```
   pip install idcheckio
 ```
 
-## Usage
+Usage
+-----
 ### AnalyseMRZ
+
 .. code-block:: python
     import idcheckio
     conn = idcheckio.IDCheckIO("example@example.com", "exemple")
