@@ -16,7 +16,7 @@ Requirements
 
 This module works in Python2.X and Python3.X.
 
-### Account
+**Account**
 
 To create your account an credit, contact us by email with your needs at : contact@idcheck.io
 
@@ -24,17 +24,23 @@ To create your account an credit, contact us by email with your needs at : conta
 Installation
 ------------
 To install Requests, simply:
-```
-  pip install idcheckio
-```
+.. code-block:: bash
+
+    $ pip install idcheckio
+
 
 Usage
 -----
-### AnalyseMRZ
+**AnalyseMRZ**
 
 .. code-block:: python
+
     import idcheckio
     conn = idcheckio.IDCheckIO("example@example.com", "exemple")
     result = conn.analyse_mrz("P<UTOBANDERAS<<LILIAN<<<<<<<<<<<<<<<<<<<<<<<",
                               "01234567894UTO8001014F2501017<<<<<<<<<<<<<06")
 
+Documentation
+-------------
+
+Soon...
