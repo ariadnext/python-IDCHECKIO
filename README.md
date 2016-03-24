@@ -1,4 +1,4 @@
-# IDCHECKIO 
+# python-IDCHECKIO : Python Library for IDCHECKIO API
 
 ![IDCHECKIO logo](https://www.idcheck.io/content/uploads/sites/2/2015/12/tick_mark.png)
 
@@ -11,13 +11,21 @@ Swagger REST API : <https://api.idcheck.io/swagger/#/>
 ## Requirements
 This module works in Python2.X and Python3.X.
 
+### Account
+To create your account an credit, contact us by email with your needs at : contact@idcheck.io
+
+
 ## Installation
+To install Requests, simply:
 ```
   pip install idcheckio
 ```
 
-## To test
+## Usage
+### AnalyseMRZ
 ```
-  PYTHONPATH=. python3.4 examples/analyseMRZ.py
-  PYTHONPATH=. python2.7 examples/analyseMRZ.py
+import idcheckio
+
+conn = idcheckio.IDCheckIO("example@example.com", "exemple")
+result = conn.analyse_mrz("P<UTOBANDERAS<<LILIAN<<<<<<<<<<<<<<<<<<<<<<<", "01234567894UTO8001014F2501017<<<<<<<<<<<<<06")
 ```
