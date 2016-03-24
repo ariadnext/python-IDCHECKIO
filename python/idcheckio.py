@@ -8,6 +8,9 @@ import requests
 
 def b64_encode(data):
     """Adapt base64 encoding for an compatible code between python 2 and 3.
+
+    Arguments:
+        data (): data to encode.
     """
 
     if(sys.version_info[0] == 2 or isinstance(data, bytes)):
@@ -17,12 +20,47 @@ def b64_encode(data):
 
 def b64_decode(data):
      """Adapt base64 decoding for an compatible code between python 2 and 3.
+
+     Arguments:
+         data (): data to decode.
      """
 
      if(isinstance(data, bytes)):
          return data.decode()
      else:
          return base64.b64decode(data)
+
+def schemeCompliant(dic, scheme):
+    """Return a dict without keys who aren't in a scheme.
+    Arguments:
+        dic (dict): Dictionnary to transform.
+        scheme (dict): Dictionnary scheme.
+    """
+    result = {}
+    if(sys.version_info[0] == 2):
+        for key,value in dic.iteritems():
+            if isinstance(value, str) or isinstance(value, int) or isinstance(
+                    value, unicode):
+                if scheme.has_key(key):
+                    result[key] = value
+            elif isinstance(value, dict):
+                if scheme.has_key(key):
+                    result[key] = schemeCompliant(value, scheme[key])
+            elif isinstance(value, list):
+                if scheme.has_key(key):
+                    result[key] = value
+    else:
+        for key,value in dic.items():
+            if isinstance(value, str) or isinstance(value, int):
+                if key in scheme:
+                    result[key] = value
+            elif isinstance(value, dict):
+                if key in scheme:
+                    result[key] = schemeCompliant(value, scheme[key])
+            elif isinstance(value, list):
+                if key in scheme:
+                    result[key] = value
+    return result
 
 class ResponseIDCIO:
     """Class describe a IDCheckIO response.
@@ -36,13 +74,12 @@ class ResponseIDCIO:
     Attributes:
         status (int): The http's code of the current request.
         uid (int): The uid code reference the current request.
-        body (str): The response's content in JSON format.
+        body (dict): The response's content in JSON format.
 
     Note;
         The uid can be retrieve in the body element (body['uid']).
     """
-
-
+    
     def __init__(self, status, uid, body):
         """Initiation function to create a ResponseIDCIO object.
 
@@ -52,12 +89,52 @@ class ResponseIDCIO:
         Arguments:
             status (int): The http's code of the current request.
             uid (int): The uid code reference the current request.
-            body (int): The response's content in JSON format.
+            body (dict): The response's content in JSON format.
         """
 
+        defaultScheme = { 'analysisRefUid': '',
+                      'uid': '',
+                      'mrz': {
+                          'line2': '',
+                          'line1': ''},
+                      'holderDetail': {
+                          'birthPlace': '',
+                          'firstName': [''],
+                          'lastName': [''],
+                          'address': '',
+                          'birthDate': {
+                              'year': '',
+                              'day': '',
+                              'month': ''},
+                          'gender': '',
+                          'nationality': ''},
+                      'documentDetail': {
+                          'emitCountry': '',
+                          'extraInfos': [{
+                              'dataKey': '',
+                              'dataValue': '',
+                              'title': ''}],
+                          'documentNumber': '',
+                          'emitDate': {
+                              'year': '',
+                              'month': '',
+                              'day': ''},
+                          'expirationDate': {
+                              'year': '',
+                              'month': '',
+                              'day': ''}},
+                      'checkReportSummary': {
+                          'check': [{
+                              'titleMsg': '',
+                              'identifier': '',
+                              'result': '',
+                              'resultMsg': ''}]},
+                      'documentClassification': {
+                          'idType': ''},
+                      'report': ''} # Specific get_report
         self._status = status
         self._uid = uid
-        self._body = body
+        self._body = schemeCompliant(body, defaultScheme)
 
 
     def _get_status(self):
@@ -185,7 +262,7 @@ class IDCheckIO:
             response = requests.post(url, data=json.dumps(data), headers=self.headers,
                                  verify=self.verify)
             result = ResponseIDCIO(response.status_code, response.json()["uid"],
-                                       response.json())
+                                   response.json())
         except requests.exceptions.ConnectionError:
             result = ResponseIDCIO(-1, 0,
                                    {"errorMessage": "Error: Unable to acess server"})
