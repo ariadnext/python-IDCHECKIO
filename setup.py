@@ -19,7 +19,7 @@ test_requirements = []
 
 setup(
     name='idcheckio',
-    version='0.0.4',
+    version='0.0.5',
     description='Python IDCheckIO library',
     long_description='See on https://github.com/ariadnext/IDCheckIO',
     author='Denis Jagoudel',
