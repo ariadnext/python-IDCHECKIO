@@ -131,7 +131,11 @@ class ResponseIDCIO:
                               'resultMsg': ''}]},
                       'documentClassification': {
                           'idType': ''},
-                      'report': ''} # Specific get_report
+                      'report': '',
+                      'accepted': '',
+                      'started': '',
+                      'ended': '',
+                      'redirectUrl'} # Specific get_report
         self._status = status
         self._uid = uid
         self._body = schemeCompliant(body, defaultScheme)
@@ -333,6 +337,7 @@ class IDCheckIO:
             data['backImage'] = ""
 
         try:
+            print("{}".format(json.dumps(data)))
             response = requests.post(url, data=json.dumps(data), headers=self.headers,
                                  verify=self.verify)
             result = ResponseIDCIO(response.status_code, response.json()["uid"],
