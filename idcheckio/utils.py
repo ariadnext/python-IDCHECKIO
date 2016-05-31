@@ -135,7 +135,7 @@ class ResponseIDCIO:
                       'accepted': '',
                       'started': '',
                       'ended': '',
-                      'redirectUrl'} # Specific get_report
+                      'redirectUrl': ''} # Specific get_report
         self._status = status
         self._uid = uid
         self._body = schemeCompliant(body, defaultScheme)
