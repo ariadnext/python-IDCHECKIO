@@ -5,7 +5,6 @@ import base64
 import json
 import requests
 
-
 def b64_encode(data):
     """Adapt base64 encoding for an compatible code between python 2 and 3.
 
@@ -262,16 +261,23 @@ class IDCheckIO:
         data = {'line1': line1, 'line2': line2, 'line3': line3}
         url = self.url + methode + arguments
 
+
         try:
             response = requests.post(url, data=json.dumps(data), headers=self.headers,
                                  verify=self.verify)
             result = ResponseIDCIO(response.status_code, response.json()["uid"],
                                    response.json())
+        except requests.exceptions.SSLError:
+            result = ResponseIDCIO(-1, 0,
+                                   {"errorMessage": "certificate verify failed"})
         except requests.exceptions.ConnectionError:
             result = ResponseIDCIO(-1, 0,
                                    {"errorMessage": "Error: Unable to acess server"})
         except KeyError:
             result = ResponseIDCIO(response.status_code, 0, response.json())
+        except ValueError:
+            result = ResponseIDCIO(response.status_code, 0,
+                                   {"errorMessage": "Something wrong, check http code"})
 
         return result
 
@@ -293,9 +299,9 @@ class IDCheckIO:
         necessary to get the status of the demand.
 
         Arguments:
-            recto (str): The image of the identity card with the MRZ encodes in 
+            recto (str): The image of the identity card with the MRZ encoded in 
                 base64.
-            verso (optional[str]): The other side of the identity card encodes in
+            verso (optional[str]): The other side of the identity card encoded in
                 base64.
             async (optional[bool]): If use the asynchronous mode. Default is
                 'False'.
@@ -337,7 +343,6 @@ class IDCheckIO:
             data['backImage'] = ""
 
         try:
-            print("{}".format(json.dumps(data)))
             response = requests.post(url, data=json.dumps(data), headers=self.headers,
                                  verify=self.verify)
             result = ResponseIDCIO(response.status_code, response.json()["uid"],
