@@ -41,6 +41,7 @@ Usage
 You can use the result object to call differents methods.
 
 All response use the same format and is compose in 3 parts:
+
 - status : the status of the request (http code)
 - uid : the uid for the current analysis
 - body : the server response in JSON format
@@ -49,7 +50,7 @@ Analysis
 --------
 
 
-Analyze a MRZ
+**Analyze a MRZ**
 
 .. code-block:: python
 
@@ -58,7 +59,7 @@ Analyze a MRZ
 
 This example use 2 MRZ lines. You can set 1, 2 or 3 lines.
 
-Analyze an image
+**Analyze an image**
 
 .. code-block:: python
 
@@ -67,12 +68,13 @@ Analyze an image
 This method accept 2 images (recto and verso).
 
 There are two different ways to put an image:
+
 - with the system path and the argument path with value True
 - directly encoded in base64
 
 You can set the asynchronous mode with the argument async (True)
 
-Get a result of the analyze
+**Get a result of the analyze**
 
 .. code-block:: python
 
@@ -80,13 +82,13 @@ Get a result of the analyze
 
 This is useful in asynchronous mode. On synchronous mode, this result is directly returned in the response of the function.
 
-Get a PDF report
+**Get a PDF report**
 
 .. code-block:: python
 
     report = conn.get_report(result.uid)
 
-Get the status of a request
+**Get the status of a request**
 
 .. code-block:: python
 
@@ -105,13 +107,13 @@ This example return the result of the analysis when this is done. Useful in a th
 Administration
 --------------
 
-Get the server status
+**Get the server status**
 
 .. code-block:: python
 
     status = conn.healthcheck()
 
-Get the number of credits
+**Get the number of credits**
 
 .. code-block:: python
 
@@ -121,7 +123,7 @@ Get the number of credits
 Sandbox
 -------
 
-Get the list of sandbox MRZ
+**Get the list of sandbox MRZ**
 
 .. code-block:: python
 
@@ -129,7 +131,7 @@ Get the list of sandbox MRZ
 
 Only keys returned in this list can be used with the function get_mrz.
 
-Get a MRZ for a test
+**Get a MRZ for a test**
 
 .. code-block:: python
 
@@ -137,7 +139,7 @@ Get a MRZ for a test
 
 The returned MRZ can be used for a test with the function analyze_mrz.
 
-Get the list of sandbox images
+**Get the list of sandbox images**
 
 .. code-block:: python
 
@@ -145,7 +147,7 @@ Get the list of sandbox images
 
 Only keys returned in this list can be used with the function get_image.
 
-Get a image for a test
+**Get a image for a test**
 
 .. code-block:: python
 
