@@ -13,7 +13,7 @@ def b64_encode(data):
     """
 
     if(sys.version_info[0] == 2 or isinstance(data, bytes)):
-        return base64.b64encode(data) 
+        return base64.b64encode(data)
     else:
         return base64.b64encode(data.encode()).decode()
 
@@ -78,7 +78,7 @@ class ResponseIDCIO:
     Note;
         The uid can be retrieve in the body element (body['uid']).
     """
-    
+
     def __init__(self, status, uid, body):
         """Initiation function to create a ResponseIDCIO object.
 
@@ -94,8 +94,9 @@ class ResponseIDCIO:
         defaultScheme = { 'analysisRefUid': '',
                       'uid': '',
                       'mrz': {
+                          'line1': '',
                           'line2': '',
-                          'line1': ''},
+                          'line3': '',},
                       'holderDetail': {
                           'birthPlace': '',
                           'firstName': [''],
@@ -134,7 +135,11 @@ class ResponseIDCIO:
                       'accepted': '',
                       'started': '',
                       'ended': '',
-                      'redirectUrl': ''} # Specific get_report
+                      'redirectUrl': '',
+                      'status': '',
+                      'errorMessage': '',
+                      'remainingCredits': '',
+                      'list': [],} # Specific get_report
         self._status = status
         self._uid = uid
         self._body = schemeCompliant(body, defaultScheme)
@@ -186,7 +191,7 @@ class IDCheckIO:
             modify on the idcheck.io server. Default is '443'.
         verify (optional[bool]): If verify the SSL certificate of the server.
             Do not modify on the idcheck.io server. Default is 'True'.
-    
+
     Note:
         It is juste necessary to use the user and pwd attributes. For initiate
         a connection : conn = idcheckio.IDCheckIO("user@login.com","password")
@@ -222,13 +227,16 @@ class IDCheckIO:
         self.port = port
         self.verify = verify
         self.language = language
-        self.url = protocol + "://" + host + ":" + port
+        self.url = protocol + "://" + host + ":" + str(port)
         concat = user + ":" + pwd
         auth = b64_encode(concat)
         self.headers = {'Content-Type': 'application/json',
                         'Authorization': "Basic " + auth,
                         'Accept-Language': language}
 
+################################################################################
+############################### ANALYSIS METHOD ################################
+################################################################################
 
     def analyse_mrz(self, line1, line2="", line3="", async=False):
         """Analyse a MRZ (Machine Readable Zone) from an identity card.
@@ -261,7 +269,6 @@ class IDCheckIO:
         data = {'line1': line1, 'line2': line2, 'line3': line3}
         url = self.url + methode + arguments
 
-
         try:
             response = requests.post(url, data=json.dumps(data), headers=self.headers,
                                  verify=self.verify)
@@ -272,7 +279,7 @@ class IDCheckIO:
                                    {"errorMessage": "certificate verify failed"})
         except requests.exceptions.ConnectionError:
             result = ResponseIDCIO(-1, 0,
-                                   {"errorMessage": "Error: Unable to acess server"})
+                                   {"errorMessage": "Error: Unable to access server"})
         except KeyError:
             result = ResponseIDCIO(response.status_code, 0, response.json())
         except ValueError:
@@ -299,7 +306,7 @@ class IDCheckIO:
         necessary to get the status of the demand.
 
         Arguments:
-            recto (str): The image of the identity card with the MRZ encoded in 
+            recto (str): The image of the identity card with the MRZ encoded in
                 base64.
             verso (optional[str]): The other side of the identity card encoded in
                 base64.
@@ -322,10 +329,10 @@ class IDCheckIO:
                 print("Error: access recto file : {}".format(recto))
                 return ResponseIDCIO(-1, 0,
                                      {"errorMessage": "Error: access recto file"})
- 
+
             if verso:
                 try:
-                    with open(verso, "rb") as verso_file: 
+                    with open(verso, "rb") as verso_file:
                         encoded_verso = b64_encode(verso_file.read())
                 except IOError:
                     print("Warn: access verso file : {}".format(verso))
@@ -348,8 +355,8 @@ class IDCheckIO:
             result = ResponseIDCIO(response.status_code, response.json()["uid"],
                                    response.json())
         except requests.exceptions.ConnectionError:
-            result = ResponseIDCIO(-1, 0, 
-                                   {"errorMessage": "Error: Unable to acess server"})
+            result = ResponseIDCIO(-1, 0,
+                                   {"errorMessage": "Error: Unable to access server"})
         except KeyError:
             result = ResponseIDCIO(response.status_code, 0, response.json())
 
@@ -394,8 +401,8 @@ class IDCheckIO:
             result = ResponseIDCIO(response.status_code, response.json()["uid"],
                                    response.json())
         except requests.exceptions.ConnectionError:
-            result = ResponseIDCIO(-1, 0, 
-                                   {"errorMessage": "Error: Unable to acess server"})
+            result = ResponseIDCIO(-1, 0,
+                                   {"errorMessage": "Error: Unable to access server"})
         except KeyError:
             result = ResponseIDCIO(response.status_code, 0, response.json())
 
@@ -442,8 +449,8 @@ class IDCheckIO:
             result = ResponseIDCIO(response.status_code, uid,
                                    {"errorMessage": "No report available"})
         except  requests.exceptions.ConnectionError:
-            result = ResponseIDCIO(-1, 0, 
-                                   {"errorMessage": "Error: Unable to acess server"})
+            result = ResponseIDCIO(-1, 0,
+                                   {"errorMessage": "Error: Unable to access server"})
         except IOError:
             print("Warn: writin file to {}".format(path))
 
@@ -491,7 +498,194 @@ class IDCheckIO:
                     result = ResponseIDCIO(response.status_code, uid,
                                            {"errorMessage": "Error with the image"})
         except  requests.exceptions.ConnectionError:
-            result = ResponseIDCIO(-1, 0, 
-                                   {"errorMessage": "Error: Unable to acess server"})
+            result = ResponseIDCIO(-1, 0,
+                                   {"errorMessage": "Error: Unable to access server"})
 
+        return result
+
+################################################################################
+############################ ADMINISTRATION METHOD #############################
+################################################################################
+
+    def healthcheck(self):
+        """Get the current status of the server.
+
+        Return a ResponseIDCIO with the status (http code), a zero uid and the
+        body with the server response in JSON format.
+
+        Arguments:
+            no arguments.
+
+        Note:
+
+        """
+
+        methode = "/rest/v0/admin/health"
+
+        url = self.url + methode
+
+        try:
+            response = requests.get(url, headers=self.headers, verify=self.verify,
+                                    allow_redirects=False)
+            result = ResponseIDCIO(response.status_code, 0, response.json())
+
+        except  requests.exceptions.ConnectionError:
+            result = ResponseIDCIO(-1, 0,
+                                   {"errorMessage": "Error: Unable to access server"})
+
+        return result
+
+    def get_credits(self):
+        """Get the number of credits for the current user.
+
+        Return a ResponseIDCIO with the status (http code), a zero uid and the
+        body with the server response in JSON format.
+
+        Arguments:
+            no arguments.
+
+        Note:
+
+        """
+
+        methode = "/rest/v0/admin/user"
+
+        url = self.url + methode
+
+        try:
+            response = requests.get(url, headers=self.headers, verify=self.verify,
+                                    allow_redirects=False)
+            result = ResponseIDCIO(response.status_code, 0, response.json())
+
+        except  requests.exceptions.ConnectionError:
+            result = ResponseIDCIO(-1, 0,
+                                   {"errorMessage": "Error: Unable to access server"})
+
+        return result
+
+################################################################################
+################################ SANDBOX METHOD ################################
+################################################################################
+
+    def get_mrzlist(self):
+        """Get the list of supported MRZ for a sandbox test.
+
+        Return a ResponseIDCIO with the status (http code), a zero uid and the
+        body with the server response in JSON format.
+
+        Arguments:
+            no arguments.
+
+        Note:
+
+        """
+
+        methode = "/rest/v0/sandbox/mrzlist"
+
+        url = self.url + methode
+
+        try:
+            response = requests.get(url, headers=self.headers, verify=self.verify,
+                                    allow_redirects=False)
+            result = ResponseIDCIO(response.status_code, 0, {'list': response.json()})
+
+        except  requests.exceptions.ConnectionError:
+            result = ResponseIDCIO(-1, 0,
+                                   {"errorMessage": "Error: Unable to access server"})
+
+        return result
+
+    def get_imagelist(self):
+        """Get the list of supported Image for a sandbox test.
+
+        Return a ResponseIDCIO with the status (http code), a zero uid and the
+        body with the server response in JSON format.
+
+        Arguments:
+            no arguments.
+
+        Note:
+
+        """
+
+        methode = "/rest/v0/sandbox/imagelist"
+
+        url = self.url + methode
+
+        try:
+            response = requests.get(url, headers=self.headers, verify=self.verify,
+                                    allow_redirects=False)
+            result = ResponseIDCIO(response.status_code, 0, {'list': response.json()})
+
+        except  requests.exceptions.ConnectionError:
+            result = ResponseIDCIO(-1, 0,
+                                   {"errorMessage": "Error: Unable to access server"})
+
+        return result
+
+    def get_mrz(self, mrzUid):
+        """Get the MRZ from supported MRZ to use in sandbox.
+
+        Return a ResponseIDCIO with the status (http code), a zero uid and the
+        body with the server response in JSON format.
+
+        Arguments:
+            mrzUid (str): the MRZ reference from the supported list (get_mrzlist).
+
+        Note:
+            Useful with get_mrzlist method.
+        """
+
+        methode = "/rest/v0/sandbox/mrz/"
+
+        url = self.url + methode + mrzUid
+
+        try:
+            response = requests.get(url, headers=self.headers, verify=self.verify,
+                                    allow_redirects=False)
+            result = ResponseIDCIO(response.status_code, 0, {'mrz': response.json()})
+
+        except  requests.exceptions.ConnectionError:
+            result = ResponseIDCIO(-1, 0,
+                                   {"errorMessage": "Error: Unable to access server"})
+        except ValueError:
+            result = ResponseIDCIO(response.status_code, 0,
+                                    {'errorMessage': 'MRZ is not in the list'})
+        return result
+
+    def get_image(self, imageUid, rawType="BASE64", face="RECTO", light="DL"):
+        """Get the image from supported Image to use in sandbox.
+
+        Return a ResponseIDCIO with the status (http code), a zero uid and the
+        body with the server response in JSON format.
+
+        Arguments:
+            imageUid (str): the image reference from the supported list (get_imagelist).
+
+            rawType (str): the image format, BASE64 (default) or JPG.
+
+            face (str): the image side, RECTO (default) or VERSO.
+
+            light (str): the light exposition, DL (default), IR or UV.
+
+        Note:
+            Useful with get_imagelist method.
+        """
+
+        methode = "/rest/v0/sandbox/image/"
+        arguments = "?rawType=" + rawType + "&face=" + face + "&light=" + light
+
+        url = self.url + methode + imageUid + arguments
+
+        try:
+            response = requests.get(url, headers=self.headers, verify=self.verify,
+                                    allow_redirects=False)
+            result = ResponseIDCIO(response.status_code, 0, {'report': response.json()})
+
+        except  requests.exceptions.ConnectionError:
+            result = ResponseIDCIO(-1, 0,
+                                   {"errorMessage": "Error: Unable to access server"})
+        except ValueError:
+            result = ResponseIDCIO(response.status_code, 0,
+                                    {'errorMessage': 'MRZ is not in the list'})
         return result
