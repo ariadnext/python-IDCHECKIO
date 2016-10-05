@@ -189,6 +189,7 @@ class IDCheckIO:
     Attributes:
         user (str): The user's login, create on the website idcheck.io.
         pwd (str): The password associate to the user's login.
+        mode (str): PROD (default), TEST or SANDBOX environment.
         language (optional[str]): The language use for the responses. Only
             'fr' or 'en' supported. Default is 'en'.
         host (optional[str]): The server to use (IP or FQDN). Do not modify
@@ -206,7 +207,7 @@ class IDCheckIO:
     """
 
 
-    def __init__(self, user, pwd, language="en", host="api.idcheck.io",
+    def __init__(self, user, pwd, mode="PROD", language="en", host="",
                  protocol="https", port="443", verify=True):
         """Initialisation function to create the connection on the idcheck.io
         server.
@@ -216,6 +217,7 @@ class IDCheckIO:
         Arguments:
             user (str): The user's login, create on the website idcheck.io.
             pwd (str): The password associate to the user's login.
+            mode (optional[str]): PROD (default), TEST or SANDBOX environment.
             language (optional[str]): The language use for the responses. Only
                 'fr' or 'en' supported. Default is 'en'.
             host (optional[str]): The server to use (IP or FQDN). Do not modify
@@ -230,12 +232,21 @@ class IDCheckIO:
 
         self.user = user
         self.pwd = pwd
-        self.host = host
+        self.mode = mode
+        if (host == ""):
+            if (mode == "SANDBOX"):
+                self.host = "sandbox.idcheck.io"
+            elif (mode == "TEST"):
+                self.host = "api-test.idcheck.io"
+            else:
+                self.host = "api.idcheck.io"
+        else:
+            self.host = host
         self.protocol = protocol
         self.port = port
         self.verify = verify
         self.language = language
-        self.url = protocol + "://" + host + ":" + str(port)
+        self.url = protocol + "://" + self.host + ":" + str(port)
         concat = user + ":" + pwd
         auth = b64_encode(concat)
         self.headers = {'Content-Type': 'application/json',
@@ -291,7 +302,7 @@ class IDCheckIO:
         except KeyError:
             result = ResponseIDCIO(response.status_code, 0, response.json())
         except ValueError:
-            result = ResponseIDCIO(response.status_code, 0,
+            result = ResponseIDCIO(404, 0,
                                    {"errorMessage": "Something wrong, check http code"})
 
         return result
@@ -460,6 +471,8 @@ class IDCheckIO:
             result = ResponseIDCIO(-1, 0,
                                    {"errorMessage": "Unable to access server"})
         except IOError:
+            result = ResponseIDCIO(-1, 0,
+                                   {"errorMessage": "Something wrong, check http code"})
             print("Warn: writin file to {}".format(path))
 
         return result
