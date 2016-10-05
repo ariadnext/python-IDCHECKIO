@@ -8,7 +8,7 @@ conn = idcheckio.IDCheckIO("example@example.com", "exemple")
 # Send image for analysis
 result = conn.analyse_image("/tmp/recto.jpg", async=True, path=True)
 
-# Client pooling
+# Client polling
 while 1:
     # Get the status of the task
     status = conn.get_status(result.uid)
