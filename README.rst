@@ -24,6 +24,7 @@ You will receive two sets of credentials: one for test purpose only and on for p
 **Platforms**
 
 Three platforms can be targeted with the library:
+
 +------------+----------------------------------+-------------+------------------------------------------+----------------------------------------+----------------------+
 | Platform   |      API URL                     | Credentials | Purpose                                  | Restriction                            | Cost                 |
 +============+==================================+=============+==========================================+========================================+======================+ 
