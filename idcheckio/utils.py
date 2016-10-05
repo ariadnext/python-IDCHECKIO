@@ -139,7 +139,13 @@ class ResponseIDCIO:
                       'status': '',
                       'errorMessage': '',
                       'remainingCredits': '',
-                      'list': [],} # Specific get_report
+                      'images':[{
+                            'doc': '',
+                            'face': '',
+                            'rawType': '',
+                            'light': '',
+                      }],
+                      'image': '',} # Specific get_report
         self._status = status
         self._uid = uid
         self._body = schemeCompliant(body, defaultScheme)
@@ -238,8 +244,8 @@ class IDCheckIO:
 ############################### ANALYSIS METHOD ################################
 ################################################################################
 
-    def analyse_mrz(self, line1, line2="", line3="", async=False):
-        """Analyse a MRZ (Machine Readable Zone) from an identity card.
+    def analyze_mrz(self, line1, line2="", line3="", async=False):
+        """Analyze a MRZ (Machine Readable Zone) from an identity card.
 
         Return a ResponseIDCIO with the status (http code), the uid of the
         request and the body with the server response in JSON format.
@@ -279,7 +285,7 @@ class IDCheckIO:
                                    {"errorMessage": "certificate verify failed"})
         except requests.exceptions.ConnectionError:
             result = ResponseIDCIO(-1, 0,
-                                   {"errorMessage": "Error: Unable to access server"})
+                                   {"errorMessage": "Unable to access server"})
         except KeyError:
             result = ResponseIDCIO(response.status_code, 0, response.json())
         except ValueError:
@@ -289,8 +295,8 @@ class IDCheckIO:
         return result
 
 
-    def analyse_image(self, recto, verso="", async=False, path=False):
-        """Analyse an identity card from image (recto and verso).
+    def analyze_image(self, recto, verso="", async=False, path=False):
+        """Analyze an identity card from image (recto and verso).
 
         Return a ResponseIDCIO with the status (http code), the uid of the request
         and the body with the server response in JSON format.
@@ -328,7 +334,7 @@ class IDCheckIO:
             except IOError:
                 print("Error: access recto file : {}".format(recto))
                 return ResponseIDCIO(-1, 0,
-                                     {"errorMessage": "Error: access recto file"})
+                                     {"errorMessage": "Access recto file"})
 
             if verso:
                 try:
@@ -343,9 +349,9 @@ class IDCheckIO:
             encoded_recto = recto
             encoded_verso = verso
 
-        data = {'frontImage': b64_decode(encoded_recto)}
+        data = {'frontImage': encoded_recto}
         if encoded_verso:
-            data['backImage'] = b64_decode(encoded_verso)
+            data['backImage'] = encoded_verso
         else:
             data['backImage'] = ""
 
@@ -356,7 +362,7 @@ class IDCheckIO:
                                    response.json())
         except requests.exceptions.ConnectionError:
             result = ResponseIDCIO(-1, 0,
-                                   {"errorMessage": "Error: Unable to access server"})
+                                   {"errorMessage": "Unable to access server"})
         except KeyError:
             result = ResponseIDCIO(response.status_code, 0, response.json())
 
@@ -402,7 +408,7 @@ class IDCheckIO:
                                    response.json())
         except requests.exceptions.ConnectionError:
             result = ResponseIDCIO(-1, 0,
-                                   {"errorMessage": "Error: Unable to access server"})
+                                   {"errorMessage": "Unable to access server"})
         except KeyError:
             result = ResponseIDCIO(response.status_code, 0, response.json())
 
@@ -450,7 +456,7 @@ class IDCheckIO:
                                    {"errorMessage": "No report available"})
         except  requests.exceptions.ConnectionError:
             result = ResponseIDCIO(-1, 0,
-                                   {"errorMessage": "Error: Unable to access server"})
+                                   {"errorMessage": "Unable to access server"})
         except IOError:
             print("Warn: writin file to {}".format(path))
 
@@ -489,17 +495,17 @@ class IDCheckIO:
             try:
                 end = response.json()["ended"]
                 result = ResponseIDCIO(response.status_code, response.json()["uid"],
-                                       {"result": "OK"})
+                                       {"status": "OK"})
             except KeyError:
                 try:
                     result = ResponseIDCIO(response.status_code, response.json()["uid"],
-                                           {"result": "Waiting"})
+                                           {"status": "Waiting"})
                 except KeyError:
                     result = ResponseIDCIO(response.status_code, uid,
                                            {"errorMessage": "Error with the image"})
         except  requests.exceptions.ConnectionError:
             result = ResponseIDCIO(-1, 0,
-                                   {"errorMessage": "Error: Unable to access server"})
+                                   {"errorMessage": "Unable to access server"})
 
         return result
 
@@ -531,7 +537,10 @@ class IDCheckIO:
 
         except  requests.exceptions.ConnectionError:
             result = ResponseIDCIO(-1, 0,
-                                   {"errorMessage": "Error: Unable to access server"})
+                                   {"errorMessage": "Unable to access server"})
+        except ValueError:
+            result = ResponseIDCIO(-1, 0,
+                                   {"errorMessage": "Method error, maybe not supported by the server"})
 
         return result
 
@@ -559,8 +568,10 @@ class IDCheckIO:
 
         except  requests.exceptions.ConnectionError:
             result = ResponseIDCIO(-1, 0,
-                                   {"errorMessage": "Error: Unable to access server"})
-
+                                   {"errorMessage": "Unable to access server"})
+        except ValueError:
+            result = ResponseIDCIO(-1, 0,
+                                   {"errorMessage": "Method error, maybe not supported by the server"})
         return result
 
 ################################################################################
@@ -587,12 +598,14 @@ class IDCheckIO:
         try:
             response = requests.get(url, headers=self.headers, verify=self.verify,
                                     allow_redirects=False)
-            result = ResponseIDCIO(response.status_code, 0, {'list': response.json()})
+            result = ResponseIDCIO(response.status_code, 0, response.json())
 
         except  requests.exceptions.ConnectionError:
             result = ResponseIDCIO(-1, 0,
-                                   {"errorMessage": "Error: Unable to access server"})
-
+                                   {"errorMessage": "Unable to access server"})
+        except ValueError:
+            result = ResponseIDCIO(-1, 0,
+                                   {"errorMessage": "Method error, maybe not supported by the server"})
         return result
 
     def get_imagelist(self):
@@ -615,12 +628,14 @@ class IDCheckIO:
         try:
             response = requests.get(url, headers=self.headers, verify=self.verify,
                                     allow_redirects=False)
-            result = ResponseIDCIO(response.status_code, 0, {'list': response.json()})
+            result = ResponseIDCIO(response.status_code, 0, response.json())
 
         except  requests.exceptions.ConnectionError:
             result = ResponseIDCIO(-1, 0,
-                                   {"errorMessage": "Error: Unable to access server"})
-
+                                   {"errorMessage": "Unable to access server"})
+        except ValueError:
+            result = ResponseIDCIO(-1, 0,
+                                   {"errorMessage": "Method error, maybe not supported by the server"})
         return result
 
     def get_mrz(self, mrzUid):
@@ -643,14 +658,14 @@ class IDCheckIO:
         try:
             response = requests.get(url, headers=self.headers, verify=self.verify,
                                     allow_redirects=False)
-            result = ResponseIDCIO(response.status_code, 0, {'mrz': response.json()})
+            result = ResponseIDCIO(response.status_code, 0, response.json())
 
         except  requests.exceptions.ConnectionError:
             result = ResponseIDCIO(-1, 0,
-                                   {"errorMessage": "Error: Unable to access server"})
+                                   {"errorMessage": "Unable to access server"})
         except ValueError:
             result = ResponseIDCIO(response.status_code, 0,
-                                    {'errorMessage': 'MRZ is not in the list'})
+                                    {'errorMessage': 'Method error, maybe not supported by the server or MRZ not in the list'})
         return result
 
     def get_image(self, imageUid, rawType="BASE64", face="RECTO", light="DL"):
@@ -680,12 +695,12 @@ class IDCheckIO:
         try:
             response = requests.get(url, headers=self.headers, verify=self.verify,
                                     allow_redirects=False)
-            result = ResponseIDCIO(response.status_code, 0, {'report': response.json()})
+            result = ResponseIDCIO(response.status_code, 0, {u'image': response.text})
 
         except  requests.exceptions.ConnectionError:
             result = ResponseIDCIO(-1, 0,
-                                   {"errorMessage": "Error: Unable to access server"})
+                                   {"errorMessage": "Unable to access server"})
         except ValueError:
             result = ResponseIDCIO(response.status_code, 0,
-                                    {'errorMessage': 'MRZ is not in the list'})
+                                    {'errorMessage': 'Method error, maybe not supported by the server or image not in the list'})
         return result
