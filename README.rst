@@ -16,14 +16,24 @@ Requirements
 
 This module works in Python2.X and Python3.X.
 
-**Account**
+**Credentials**
 
-To create your account an credit, contact us by email with your needs at : contact@idcheck.io
+To get your credentials, contact us by email with your all needs at: contact@idcheck.io
+You will receive two sets of credentials: one for test purpose only and on for production.
+
+**Platforms**
+
+Three platforms can be targeted with the library:
+| Platform   |      API URL                     | Credentials | Purpose                                  | Restriction                            | Cost                 |
+|------------|----------------------------------|-------------|------------------------------------------|----------------------------------------|----------------------| 
+| SANDBOX    | https://sandbox.idcheck.io/rest  | Test        | Dev integration + automated tests        | Only a fix set of images are supported | Free                 |
+| TEST       | https://api-test.idcheck.io/rest | Test        | Functional tests / Idcheck.io evaluation | No SLA                                 | Commercial agreement |
+| PROD       | https://api.idcheck.io/rest      | Prod        | Production service                       | None                                   | Commercial agreement |
 
 
 Installation
 ============
-To install Requests, simply:
+To install idcheckio library, simply:
 
 .. code-block:: bash
 
@@ -36,57 +46,46 @@ Usage
 .. code-block:: python
 
     import idcheckio
-    conn = idcheckio.IDCheckIO("example@example.com", "exemple")
+    conn = idcheckio.IDCheckIO("example@example.com", "pwd")
 
-You can use the result object to call differents methods.
+You can use the created connection to call differents methods, as described below.
 
-All response use the same format and is compose in 3 parts:
+All responses use the same format and are made of 3 parts:
 
 - status : the status of the request (http code)
 - uid : the uid for the current analysis
 - body : the server response in JSON format
 
+For a full description of the JSON response, please see the API reference guide or use the sandbox to get some examples. 
+
 Analysis
 --------
 
-
-**Analyze a MRZ**
+**MRZ analysis**
 
 .. code-block:: python
 
     result = conn.analyze_mrz("P<UTOBANDERAS<<LILIAN<<<<<<<<<<<<<<<<<<<<<<<",
                               "01234567894UTO8001014F2501017<<<<<<<<<<<<<06")
 
-This example use 2 MRZ lines. You can set 1, 2 or 3 lines.
+This example uses a 2 lines MRZ but you can set 1, 2 or 3 lines.
 
-**Analyze an image**
-
-.. code-block:: python
-
-    result = conn.analyze_mrz("/tmp/image.jpg", path=True)
-
-This method accept 2 images (recto and verso).
-
-There are two different ways to put an image:
-
-- with the system path and the argument path with value True
-- directly encoded in base64
-
-You can set the asynchronous mode with the argument async (True)
-
-**Get a result of the analyze**
+**Image analysis**
 
 .. code-block:: python
 
-    report = conn.get_result(result.uid)
+    result = conn.analyze_image("/tmp/image.jpg", path=True)
 
-This is useful in asynchronous mode. On synchronous mode, this result is directly returned in the response of the function.
+This method accepts 2 images (recto and verso).
 
-**Get a PDF report**
+There are two different ways to specify the images:
 
-.. code-block:: python
+- with the system path. In this case the path variable must be True
+- directly encoded in base64 
 
-    report = conn.get_report(result.uid)
+By default, this function performs a synchronous call to the API and returns the analysis results. 
+If you want to use an asynchronous call, you must set the optional "async" parameter to True.
+In asynchronous mode, the get_status function should be used to know when the analysis is done. 
 
 **Get the status of a request**
 
@@ -94,7 +93,7 @@ This is useful in asynchronous mode. On synchronous mode, this result is directl
 
     report = conn.get_status(result.uid)
 
-Use in asynchronous mode. Return the status of an analysis request.
+To be used in asynchronous mode only. Returns the status of an analysis request.
 
 You can set the argument wait (int in ms) to delegate the polling to the server
 
@@ -102,18 +101,38 @@ You can set the argument wait (int in ms) to delegate the polling to the server
 
     report = conn.get_status(result.uid, wait=20000)
 
-This example return the result of the analysis when this is done. Useful in a thread, avoid polling from client.
+This example returns the result of the analysis when it is done. Useful in a thread, avoid polling from client.
+
+**Get a result of the analysis**
+
+.. code-block:: python
+
+    report = conn.get_result(result.uid)
+
+Analysis results remain available a few minutes after the analysis. The API does not provide analysis storage features and it is your responsibility to save the results if needed.
+
+**Get a PDF report**
+
+.. code-block:: python
+
+    report = conn.get_report(result.uid)
+
+Again, the API does not provide analysis storage features and it is your responsibility to save report PDF if needed.
 
 Administration
 --------------
 
 **Get the server status**
 
+This method gives the state of the service: OK, WARN (partially available) or ERROR (unavailable).
+
 .. code-block:: python
 
     status = conn.healthcheck()
 
 **Get the number of credits**
+
+This method lets you know how many credits remain on your account
 
 .. code-block:: python
 
@@ -154,3 +173,4 @@ Only keys returned in this list can be used with the function get_image.
     image = conn.get_image("PASSEPORT_CHN_SPECIMEN_ZHENGJIAN")
 
 The returned image can be used for a test with the function analyze_image.
+
