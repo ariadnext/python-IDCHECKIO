@@ -26,8 +26,10 @@ def b64_decode(data):
 
      if(isinstance(data, bytes)):
          return data.decode()
-     else:
+     elif(sys.version_info[0] == 3):
          return base64.b64decode(data)
+     else:
+         return data
 
 def schemeCompliant(dic, scheme):
     """Return a dict without keys who aren't in a scheme.
@@ -349,9 +351,9 @@ class IDCheckIO:
             encoded_recto = recto
             encoded_verso = verso
 
-        data = {'frontImage': encoded_recto}
+        data = {'frontImage': b64_decode(encoded_recto)}
         if encoded_verso:
-            data['backImage'] = encoded_verso
+            data['backImage'] = b64_decode(encoded_verso)
         else:
             data['backImage'] = ""
 
