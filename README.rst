@@ -55,13 +55,13 @@ Usage
 
 You can use the created connection to call differents methods, as described below.
 
-Set the argument mode if you want change the platform (default PROD) :
+Set the mode parameter if you want target a test platform (default PROD) :
 
 .. code-block:: python
 
     conn = idcheckio.IDCheckIO("example@example.com", "pwd", mode="TEST")
 
-All responses use the same format and are made of 3 parts:
+All API responses use the same format and are made of 3 parts:
 
 - status : the status of the request (http code)
 - uid : the uid for the current analysis
@@ -114,7 +114,7 @@ You can set the argument wait (int in ms) to delegate the polling to the server
 
 This example returns the result of the analysis when it is done. Useful in a thread, avoid polling from client.
 
-**Get a result of the analysis**
+**Get the result of an analysis**
 
 .. code-block:: python
 
@@ -128,7 +128,7 @@ Analysis results remain available a few minutes after the analysis. The API does
 
     report = conn.get_report(result.uid)
 
-Again, the API does not provide analysis storage features and it is your responsibility to save report PDF if needed.
+Again, the API does not provide analysis storage features and it is your responsibility to save the PDF report if needed.
 
 Administration
 --------------
@@ -153,7 +153,9 @@ This method lets you know how many credits remain on your account
 Sandbox
 -------
 
-**Get the list of sandbox MRZ**
+All the functions below are availabe only on sandbox platform. On test or prod platform, you will get a 404 error.
+
+**Get the list of MRZ available on sandbox**
 
 .. code-block:: python
 
@@ -169,7 +171,7 @@ Only keys returned in this list can be used with the function get_mrz.
 
 The returned MRZ can be used for a test with the function analyze_mrz.
 
-**Get the list of sandbox images**
+**Get the list of images available on sandbox**
 
 .. code-block:: python
 
