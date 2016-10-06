@@ -55,13 +55,19 @@ Usage
 
 You can use the created connection to call differents methods, as described below.
 
+Set the argument mode if you want change the platform (default PROD) :
+
+.. code-block:: python
+
+    conn = idcheckio.IDCheckIO("example@example.com", "pwd", mode="TEST")
+
 All responses use the same format and are made of 3 parts:
 
 - status : the status of the request (http code)
 - uid : the uid for the current analysis
 - body : the server response in JSON format
 
-For a full description of the JSON response, please see the API reference guide or use the sandbox to get some examples. 
+For a full description of the JSON response, please see the API reference guide or use the sandbox to get some examples.
 
 Analysis
 --------
@@ -86,11 +92,11 @@ This method accepts 2 images (recto and verso).
 There are two different ways to specify the images:
 
 - with the system path. In this case the path variable must be True
-- directly encoded in base64 
+- directly encoded in base64
 
-By default, this function performs a synchronous call to the API and returns the analysis results. 
+By default, this function performs a synchronous call to the API and returns the analysis results.
 If you want to use an asynchronous call, you must set the optional "async" parameter to True.
-In asynchronous mode, the get_status function should be used to know when the analysis is done. 
+In asynchronous mode, the get_status function should be used to know when the analysis is done.
 
 **Get the status of a request**
 
@@ -171,11 +177,10 @@ The returned MRZ can be used for a test with the function analyze_mrz.
 
 Only keys returned in this list can be used with the function get_image.
 
-**Get a image for a test**
+**Get an image for a test**
 
 .. code-block:: python
 
     image = conn.get_image("PASSEPORT_CHN_SPECIMEN_ZHENGJIAN")
 
 The returned image can be used for a test with the function analyze_image.
-
