@@ -18,8 +18,8 @@ This module works in Python2.X and Python3.X.
 
 **Credentials**
 
-To get your credentials, contact us by email with your all needs at: contact@idcheck.io
-You will receive two sets of credentials: one for test purpose only and on for production.
+To get your credentials, contact us by email with all your needs at: contact@idcheck.io
+You will receive two sets of credentials: one for test purpose only and one for production.
 
 **Platforms**
 
@@ -28,9 +28,9 @@ Three platforms can be targeted with the library:
 +------------+----------------------------------+-------------+------------------------------------------+----------------------------------------+----------------------+
 | Platform   |      API URL                     | Credentials | Purpose                                  | Restriction                            | Cost                 |
 +============+==================================+=============+==========================================+========================================+======================+ 
-| SANDBOX    | https://sandbox.idcheck.io/rest  | Test        | Dev integration + automated tests        | Only a fix set of images are supported | Free                 |
+| SANDBOX (soon available)   | https://sandbox.idcheck.io/rest  | Test        | Dev integration + automated tests        | Only a fix set of images are supported | Free                 |
 +------------+----------------------------------+-------------+------------------------------------------+----------------------------------------+----------------------+
-| TEST       | https://api-test.idcheck.io/rest | Test        | Functional tests / Idcheck.io evaluation | No SLA                                 | Commercial agreement |
+| TEST       | https://api-test.idcheck.io/rest | Test        | Functional testing / Idcheck.io evaluation | No SLA                                 | Commercial agreement |
 +------------+----------------------------------+-------------+------------------------------------------+----------------------------------------+----------------------+
 | PROD       | https://api.idcheck.io/rest      | Prod        | Production service                       | None                                   | Commercial agreement |
 +------------+----------------------------------+-------------+------------------------------------------+----------------------------------------+----------------------+
