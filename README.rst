@@ -5,6 +5,9 @@ Python Library for IDCHECKIO API
 
 .. image:: https://www.idcheck.io/content/uploads/sites/2/2015/12/tick_mark.png
 
+This library is a python client for the Idcheck.io API. This API allows you to automatically read and verify ID documents.
+
+
 Web application : <https://idcheck.io>
 
 Mashape REST API : <https://market.mashape.com/ariadnext/idcheck-io-api>
