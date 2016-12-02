@@ -22,32 +22,32 @@
     limitations under the License.
 """
 
+from __future__ import absolute_import
+
+import os
 import sys
-from setuptools import setup, find_packages
+import unittest
 
-NAME = "idcheckio_python_client"
-VERSION = "1.0.0"
+import idcheckio_python_client
+from idcheckio_python_client.rest import ApiException
+from idcheckio_python_client.models.report_response import ReportResponse
 
-# To install the library, run the following
-#
-# python setup.py install
-#
-# prerequisite: setuptools
-# http://pypi.python.org/pypi/setuptools
 
-REQUIRES = ["urllib3 >= 1.15", "six >= 1.10", "certifi", "python-dateutil"]
+class TestReportResponse(unittest.TestCase):
+    """ ReportResponse unit test stubs """
 
-setup(
-    name=NAME,
-    version=VERSION,
-    description="IdCheck.IO API",
-    author_email="",
-    url="",
-    keywords=["Swagger", "IdCheck.IO API"],
-    install_requires=REQUIRES,
-    packages=find_packages(),
-    include_package_data=True,
-    long_description="""\
-    Check identity documents
-    """
-)
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def testReportResponse(self):
+        """
+        Test ReportResponse
+        """
+        model = idcheckio_python_client.models.report_response.ReportResponse()
+
+
+if __name__ == '__main__':
+    unittest.main()
