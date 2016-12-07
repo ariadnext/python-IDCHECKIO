@@ -41,6 +41,7 @@ setup(
     name=NAME,
     version=VERSION,
     description="IdCheck.IO API",
+    author="ariadnext",
     author_email="dev@ariadnext.com",
     url="https://www.idcheck.io",
     keywords=["Swagger", "IdCheck.IO API", "idcheckio", "id", "verifications", "passport", "verification", "visa",
